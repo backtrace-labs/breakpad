@@ -85,6 +85,9 @@ includeclc_HEADERS = $(top_srcdir)/src/client/linux/crash_generation/*.h
 includelssdir = $(includedir)/$(PACKAGE)/third_party/lss
 includelss_HEADERS = $(top_srcdir)/src/third_party/lss/*.h
 
+includecurldir = $(includedir)/$(PACKAGE)/third_party/curl
+includecurl_HEADERS = $(top_srcdir)/src/third_party/curl/*.h
+
 includecldir = $(includedir)/$(PACKAGE)/common/linux
 includecl_HEADERS = $(top_srcdir)/src/common/linux/*.h
 endif
@@ -181,8 +184,12 @@ src_client_linux_libbreakpad_client_a_SOURCES = \
 	src/common/linux/elfutils.h \
 	src/common/linux/file_id.cc \
 	src/common/linux/file_id.h \
+	src/common/linux/http_upload.cc \
+	src/common/linux/http_upload.h \
 	src/common/linux/guid_creator.cc \
 	src/common/linux/guid_creator.h \
+	src/common/linux/libcurl_wrapper.cc \
+	src/common/linux/libcurl_wrapper.h \
 	src/common/linux/linux_libc_support.cc \
 	src/common/linux/memory_mapped_file.cc \
 	src/common/linux/safe_readlink.cc

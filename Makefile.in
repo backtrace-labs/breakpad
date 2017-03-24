@@ -236,8 +236,9 @@ DIST_COMMON = $(srcdir)/Makefile.am $(top_srcdir)/configure \
 	$(am__includecl_HEADERS_DIST) $(am__includeclc_HEADERS_DIST) \
 	$(am__includecldwc_HEADERS_DIST) \
 	$(am__includeclh_HEADERS_DIST) $(am__includeclm_HEADERS_DIST) \
-	$(includegbc_HEADERS) $(am__includelss_HEADERS_DIST) \
-	$(includep_HEADERS) $(am__DIST_COMMON)
+	$(am__includecurl_HEADERS_DIST) $(includegbc_HEADERS) \
+	$(am__includelss_HEADERS_DIST) $(includep_HEADERS) \
+	$(am__DIST_COMMON)
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
 mkinstalldirs = $(install_sh) -d
@@ -276,8 +277,8 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
 	"$(DESTDIR)$(includecdir)" "$(DESTDIR)$(includecldir)" \
 	"$(DESTDIR)$(includeclcdir)" "$(DESTDIR)$(includecldwcdir)" \
 	"$(DESTDIR)$(includeclhdir)" "$(DESTDIR)$(includeclmdir)" \
-	"$(DESTDIR)$(includegbcdir)" "$(DESTDIR)$(includelssdir)" \
-	"$(DESTDIR)$(includepdir)"
+	"$(DESTDIR)$(includecurldir)" "$(DESTDIR)$(includegbcdir)" \
+	"$(DESTDIR)$(includelssdir)" "$(DESTDIR)$(includepdir)"
 LIBRARIES = $(lib_LIBRARIES) $(noinst_LIBRARIES)
 ARFLAGS = cru
 AM_V_AR = $(am__v_AR_@AM_V@)
@@ -309,8 +310,12 @@ am__src_client_linux_libbreakpad_client_a_SOURCES_DIST =  \
 	src/common/string_conversion.cc src/common/string_conversion.h \
 	src/common/linux/elf_core_dump.cc src/common/linux/elfutils.cc \
 	src/common/linux/elfutils.h src/common/linux/file_id.cc \
-	src/common/linux/file_id.h src/common/linux/guid_creator.cc \
+	src/common/linux/file_id.h src/common/linux/http_upload.cc \
+	src/common/linux/http_upload.h \
+	src/common/linux/guid_creator.cc \
 	src/common/linux/guid_creator.h \
+	src/common/linux/libcurl_wrapper.cc \
+	src/common/linux/libcurl_wrapper.h \
 	src/common/linux/linux_libc_support.cc \
 	src/common/linux/memory_mapped_file.cc \
 	src/common/linux/safe_readlink.cc \
@@ -336,7 +341,9 @@ am__dirstamp = $(am__leading_dot)dirstamp
 @LINUX_HOST_TRUE@	src/common/linux/elf_core_dump.$(OBJEXT) \
 @LINUX_HOST_TRUE@	src/common/linux/elfutils.$(OBJEXT) \
 @LINUX_HOST_TRUE@	src/common/linux/file_id.$(OBJEXT) \
+@LINUX_HOST_TRUE@	src/common/linux/http_upload.$(OBJEXT) \
 @LINUX_HOST_TRUE@	src/common/linux/guid_creator.$(OBJEXT) \
+@LINUX_HOST_TRUE@	src/common/linux/libcurl_wrapper.$(OBJEXT) \
 @LINUX_HOST_TRUE@	src/common/linux/linux_libc_support.$(OBJEXT) \
 @LINUX_HOST_TRUE@	src/common/linux/memory_mapped_file.$(OBJEXT) \
 @LINUX_HOST_TRUE@	src/common/linux/safe_readlink.$(OBJEXT) \
@@ -1658,12 +1665,13 @@ am__includeclh_HEADERS_DIST =  \
 	$(top_srcdir)/src/client/linux/handler/*.h
 am__includeclm_HEADERS_DIST =  \
 	$(top_srcdir)/src/client/linux/minidump_writer/*.h
+am__includecurl_HEADERS_DIST = $(top_srcdir)/src/third_party/curl/*.h
 am__includelss_HEADERS_DIST = $(top_srcdir)/src/third_party/lss/*.h
 HEADERS = $(includec_HEADERS) $(includecl_HEADERS) \
 	$(includeclc_HEADERS) $(includecldwc_HEADERS) \
 	$(includeclh_HEADERS) $(includeclm_HEADERS) \
-	$(includegbc_HEADERS) $(includelss_HEADERS) \
-	$(includep_HEADERS)
+	$(includecurl_HEADERS) $(includegbc_HEADERS) \
+	$(includelss_HEADERS) $(includep_HEADERS)
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
 # Read a list of newline-separated strings from the standard input,
 # and print each of them once, without duplicates.  Input order is
@@ -2002,6 +2010,7 @@ pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
+runstatedir = @runstatedir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
@@ -2039,6 +2048,8 @@ dist_doc_DATA = \
 @LINUX_HOST_TRUE@includeclc_HEADERS = $(top_srcdir)/src/client/linux/crash_generation/*.h
 @LINUX_HOST_TRUE@includelssdir = $(includedir)/$(PACKAGE)/third_party/lss
 @LINUX_HOST_TRUE@includelss_HEADERS = $(top_srcdir)/src/third_party/lss/*.h
+@LINUX_HOST_TRUE@includecurldir = $(includedir)/$(PACKAGE)/third_party/curl
+@LINUX_HOST_TRUE@includecurl_HEADERS = $(top_srcdir)/src/third_party/curl/*.h
 @LINUX_HOST_TRUE@includecldir = $(includedir)/$(PACKAGE)/common/linux
 @LINUX_HOST_TRUE@includecl_HEADERS = $(top_srcdir)/src/common/linux/*.h
 includegbcdir = $(includedir)/$(PACKAGE)/google_breakpad/common
@@ -2104,8 +2115,12 @@ CLEANFILES = $(am__append_12)
 @LINUX_HOST_TRUE@	src/common/linux/elfutils.h \
 @LINUX_HOST_TRUE@	src/common/linux/file_id.cc \
 @LINUX_HOST_TRUE@	src/common/linux/file_id.h \
+@LINUX_HOST_TRUE@	src/common/linux/http_upload.cc \
+@LINUX_HOST_TRUE@	src/common/linux/http_upload.h \
 @LINUX_HOST_TRUE@	src/common/linux/guid_creator.cc \
 @LINUX_HOST_TRUE@	src/common/linux/guid_creator.h \
+@LINUX_HOST_TRUE@	src/common/linux/libcurl_wrapper.cc \
+@LINUX_HOST_TRUE@	src/common/linux/libcurl_wrapper.h \
 @LINUX_HOST_TRUE@	src/common/linux/linux_libc_support.cc \
 @LINUX_HOST_TRUE@	src/common/linux/memory_mapped_file.cc \
 @LINUX_HOST_TRUE@	src/common/linux/safe_readlink.cc \
@@ -3569,7 +3584,13 @@ src/common/linux/elfutils.$(OBJEXT): src/common/linux/$(am__dirstamp) \
 	src/common/linux/$(DEPDIR)/$(am__dirstamp)
 src/common/linux/file_id.$(OBJEXT): src/common/linux/$(am__dirstamp) \
 	src/common/linux/$(DEPDIR)/$(am__dirstamp)
+src/common/linux/http_upload.$(OBJEXT):  \
+	src/common/linux/$(am__dirstamp) \
+	src/common/linux/$(DEPDIR)/$(am__dirstamp)
 src/common/linux/guid_creator.$(OBJEXT):  \
+	src/common/linux/$(am__dirstamp) \
+	src/common/linux/$(DEPDIR)/$(am__dirstamp)
+src/common/linux/libcurl_wrapper.$(OBJEXT):  \
 	src/common/linux/$(am__dirstamp) \
 	src/common/linux/$(DEPDIR)/$(am__dirstamp)
 src/common/linux/linux_libc_support.$(OBJEXT):  \
@@ -4543,9 +4564,6 @@ src/tools/linux/md2core/src_tools_linux_md2core_minidump_2_core_unittest-minidum
 src/tools/linux/md2core/minidump_2_core_unittest$(EXEEXT): $(src_tools_linux_md2core_minidump_2_core_unittest_OBJECTS) $(src_tools_linux_md2core_minidump_2_core_unittest_DEPENDENCIES) $(EXTRA_src_tools_linux_md2core_minidump_2_core_unittest_DEPENDENCIES) src/tools/linux/md2core/$(am__dirstamp)
 	@rm -f src/tools/linux/md2core/minidump_2_core_unittest$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(src_tools_linux_md2core_minidump_2_core_unittest_OBJECTS) $(src_tools_linux_md2core_minidump_2_core_unittest_LDADD) $(LIBS)
-src/common/linux/http_upload.$(OBJEXT):  \
-	src/common/linux/$(am__dirstamp) \
-	src/common/linux/$(DEPDIR)/$(am__dirstamp)
 src/tools/linux/symupload/$(am__dirstamp):
 	@$(MKDIR_P) src/tools/linux/symupload
 	@: > src/tools/linux/symupload/$(am__dirstamp)
@@ -4779,6 +4797,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/common/linux/$(DEPDIR)/file_id.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/common/linux/$(DEPDIR)/guid_creator.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/common/linux/$(DEPDIR)/http_upload.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/common/linux/$(DEPDIR)/libcurl_wrapper.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/common/linux/$(DEPDIR)/linux_libc_support.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/common/linux/$(DEPDIR)/memory_mapped_file.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/common/linux/$(DEPDIR)/safe_readlink.Po@am__quote@
@@ -7615,6 +7634,27 @@ uninstall-includeclmHEADERS:
 	@list='$(includeclm_HEADERS)'; test -n "$(includeclmdir)" || list=; \
 	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
 	dir='$(DESTDIR)$(includeclmdir)'; $(am__uninstall_files_from_dir)
+install-includecurlHEADERS: $(includecurl_HEADERS)
+	@$(NORMAL_INSTALL)
+	@list='$(includecurl_HEADERS)'; test -n "$(includecurldir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(includecurldir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(includecurldir)" || exit 1; \
+	fi; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(includecurldir)'"; \
+	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(includecurldir)" || exit $$?; \
+	done
+
+uninstall-includecurlHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(includecurl_HEADERS)'; test -n "$(includecurldir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	dir='$(DESTDIR)$(includecurldir)'; $(am__uninstall_files_from_dir)
 install-includegbcHEADERS: $(includegbc_HEADERS)
 	@$(NORMAL_INSTALL)
 	@list='$(includegbc_HEADERS)'; test -n "$(includegbcdir)" || list=; \
@@ -8338,7 +8378,7 @@ check: check-am
 all-am: Makefile $(LIBRARIES) $(PROGRAMS) $(SCRIPTS) $(DATA) \
 		$(HEADERS)
 installdirs:
-	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(docdir)" "$(DESTDIR)$(pkgconfigdir)" "$(DESTDIR)$(includecdir)" "$(DESTDIR)$(includecldir)" "$(DESTDIR)$(includeclcdir)" "$(DESTDIR)$(includecldwcdir)" "$(DESTDIR)$(includeclhdir)" "$(DESTDIR)$(includeclmdir)" "$(DESTDIR)$(includegbcdir)" "$(DESTDIR)$(includelssdir)" "$(DESTDIR)$(includepdir)"; do \
+	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(docdir)" "$(DESTDIR)$(pkgconfigdir)" "$(DESTDIR)$(includecdir)" "$(DESTDIR)$(includecldir)" "$(DESTDIR)$(includeclcdir)" "$(DESTDIR)$(includecldwcdir)" "$(DESTDIR)$(includeclhdir)" "$(DESTDIR)$(includeclmdir)" "$(DESTDIR)$(includecurldir)" "$(DESTDIR)$(includegbcdir)" "$(DESTDIR)$(includelssdir)" "$(DESTDIR)$(includepdir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-am
@@ -8452,9 +8492,9 @@ info-am:
 install-data-am: install-dist_docDATA install-includecHEADERS \
 	install-includeclHEADERS install-includeclcHEADERS \
 	install-includecldwcHEADERS install-includeclhHEADERS \
-	install-includeclmHEADERS install-includegbcHEADERS \
-	install-includelssHEADERS install-includepHEADERS \
-	install-pkgconfigDATA
+	install-includeclmHEADERS install-includecurlHEADERS \
+	install-includegbcHEADERS install-includelssHEADERS \
+	install-includepHEADERS install-pkgconfigDATA
 
 install-dvi: install-dvi-am
 
@@ -8506,9 +8546,9 @@ uninstall-am: uninstall-binPROGRAMS uninstall-dist_docDATA \
 	uninstall-includecHEADERS uninstall-includeclHEADERS \
 	uninstall-includeclcHEADERS uninstall-includecldwcHEADERS \
 	uninstall-includeclhHEADERS uninstall-includeclmHEADERS \
-	uninstall-includegbcHEADERS uninstall-includelssHEADERS \
-	uninstall-includepHEADERS uninstall-libLIBRARIES \
-	uninstall-pkgconfigDATA
+	uninstall-includecurlHEADERS uninstall-includegbcHEADERS \
+	uninstall-includelssHEADERS uninstall-includepHEADERS \
+	uninstall-libLIBRARIES uninstall-pkgconfigDATA
 
 .MAKE: check-am install-am install-strip
 
@@ -8527,21 +8567,22 @@ uninstall-am: uninstall-binPROGRAMS uninstall-dist_docDATA \
 	install-html-am install-includecHEADERS \
 	install-includeclHEADERS install-includeclcHEADERS \
 	install-includecldwcHEADERS install-includeclhHEADERS \
-	install-includeclmHEADERS install-includegbcHEADERS \
-	install-includelssHEADERS install-includepHEADERS install-info \
-	install-info-am install-libLIBRARIES install-man install-pdf \
-	install-pdf-am install-pkgconfigDATA install-ps install-ps-am \
-	install-strip installcheck installcheck-am installdirs \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-compile mostlyclean-generic mostlyclean-local pdf \
-	pdf-am ps ps-am recheck tags tags-am uninstall uninstall-am \
+	install-includeclmHEADERS install-includecurlHEADERS \
+	install-includegbcHEADERS install-includelssHEADERS \
+	install-includepHEADERS install-info install-info-am \
+	install-libLIBRARIES install-man install-pdf install-pdf-am \
+	install-pkgconfigDATA install-ps install-ps-am install-strip \
+	installcheck installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-compile \
+	mostlyclean-generic mostlyclean-local pdf pdf-am ps ps-am \
+	recheck tags tags-am uninstall uninstall-am \
 	uninstall-binPROGRAMS uninstall-dist_docDATA \
 	uninstall-includecHEADERS uninstall-includeclHEADERS \
 	uninstall-includeclcHEADERS uninstall-includecldwcHEADERS \
 	uninstall-includeclhHEADERS uninstall-includeclmHEADERS \
-	uninstall-includegbcHEADERS uninstall-includelssHEADERS \
-	uninstall-includepHEADERS uninstall-libLIBRARIES \
-	uninstall-pkgconfigDATA
+	uninstall-includecurlHEADERS uninstall-includegbcHEADERS \
+	uninstall-includelssHEADERS uninstall-includepHEADERS \
+	uninstall-libLIBRARIES uninstall-pkgconfigDATA
 
 .PRECIOUS: Makefile
 
