@@ -37,6 +37,7 @@ class BacktraceHandlerContext {
 };
 
 /* Global shared context */
+/* FIXME: protect with mutex */
 BacktraceHandlerContext* ctx_ = nullptr;
 
 BacktraceHandlerContext::BacktraceHandlerContext(
@@ -57,6 +58,7 @@ bool BacktraceHandlerContext::MinidumpCallback(
   if (ctx_ == nullptr) return false;
 
   if (succeeded) {
+    /* FIXME: http_layer calls dlopen("curl.so"), curl is a hidden dep. */
     if (!ctx_->http_layer_->Init()) std::cerr << "http layer init failed\n";
 
     string minidump_pathname = descriptor.path();
@@ -66,6 +68,8 @@ bool BacktraceHandlerContext::MinidumpCallback(
       return false;
     }
 
+    /* FIXME: properly parse url and adjust query string sanely */
+    /* FIXME: attributes are sent via form-data, coronerd handle this? */
     std::string url =
         ctx_->url_ + "/post?format=minidump&token=" + ctx_->token_;
 
@@ -102,4 +106,6 @@ bool BacktraceHandler::Init(const string& url, const string& token,
 
   return true;
 }
+
+/* FIXME: implement SetOrReplaceAttribute and RemoveAttribute */
 }
