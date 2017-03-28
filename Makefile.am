@@ -158,6 +158,8 @@ src_client_linux_libbreakpad_client_a_SOURCES = \
 	src/client/linux/crash_generation/crash_generation_server.cc \
 	src/client/linux/dump_writer_common/thread_info.cc \
 	src/client/linux/dump_writer_common/ucontext_reader.cc \
+	src/client/linux/handler/backtrace_handler.cc \
+	src/client/linux/handler/backtrace_handler.h \
 	src/client/linux/handler/exception_handler.cc \
 	src/client/linux/handler/exception_handler.h \
 	src/client/linux/handler/minidump_descriptor.cc \

@@ -292,6 +292,8 @@ am__src_client_linux_libbreakpad_client_a_SOURCES_DIST =  \
 	src/client/linux/crash_generation/crash_generation_server.cc \
 	src/client/linux/dump_writer_common/thread_info.cc \
 	src/client/linux/dump_writer_common/ucontext_reader.cc \
+	src/client/linux/handler/backtrace_handler.cc \
+	src/client/linux/handler/backtrace_handler.h \
 	src/client/linux/handler/exception_handler.cc \
 	src/client/linux/handler/exception_handler.h \
 	src/client/linux/handler/minidump_descriptor.cc \
@@ -326,6 +328,7 @@ am__dirstamp = $(am__leading_dot)dirstamp
 @LINUX_HOST_TRUE@	src/client/linux/crash_generation/crash_generation_server.$(OBJEXT) \
 @LINUX_HOST_TRUE@	src/client/linux/dump_writer_common/thread_info.$(OBJEXT) \
 @LINUX_HOST_TRUE@	src/client/linux/dump_writer_common/ucontext_reader.$(OBJEXT) \
+@LINUX_HOST_TRUE@	src/client/linux/handler/backtrace_handler.$(OBJEXT) \
 @LINUX_HOST_TRUE@	src/client/linux/handler/exception_handler.$(OBJEXT) \
 @LINUX_HOST_TRUE@	src/client/linux/handler/minidump_descriptor.$(OBJEXT) \
 @LINUX_HOST_TRUE@	src/client/linux/log/log.$(OBJEXT) \
@@ -2090,6 +2093,8 @@ CLEANFILES = $(am__append_12)
 @LINUX_HOST_TRUE@	src/client/linux/crash_generation/crash_generation_server.cc \
 @LINUX_HOST_TRUE@	src/client/linux/dump_writer_common/thread_info.cc \
 @LINUX_HOST_TRUE@	src/client/linux/dump_writer_common/ucontext_reader.cc \
+@LINUX_HOST_TRUE@	src/client/linux/handler/backtrace_handler.cc \
+@LINUX_HOST_TRUE@	src/client/linux/handler/backtrace_handler.h \
 @LINUX_HOST_TRUE@	src/client/linux/handler/exception_handler.cc \
 @LINUX_HOST_TRUE@	src/client/linux/handler/exception_handler.h \
 @LINUX_HOST_TRUE@	src/client/linux/handler/minidump_descriptor.cc \
@@ -3509,6 +3514,9 @@ src/client/linux/handler/$(am__dirstamp):
 src/client/linux/handler/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) src/client/linux/handler/$(DEPDIR)
 	@: > src/client/linux/handler/$(DEPDIR)/$(am__dirstamp)
+src/client/linux/handler/backtrace_handler.$(OBJEXT):  \
+	src/client/linux/handler/$(am__dirstamp) \
+	src/client/linux/handler/$(DEPDIR)/$(am__dirstamp)
 src/client/linux/handler/exception_handler.$(OBJEXT):  \
 	src/client/linux/handler/$(am__dirstamp) \
 	src/client/linux/handler/$(DEPDIR)/$(am__dirstamp)
@@ -4692,6 +4700,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/client/linux/crash_generation/$(DEPDIR)/crash_generation_server.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/client/linux/dump_writer_common/$(DEPDIR)/thread_info.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/client/linux/dump_writer_common/$(DEPDIR)/ucontext_reader.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@src/client/linux/handler/$(DEPDIR)/backtrace_handler.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/client/linux/handler/$(DEPDIR)/exception_handler.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/client/linux/handler/$(DEPDIR)/minidump_descriptor.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@src/client/linux/handler/$(DEPDIR)/src_client_linux_linux_client_unittest_shlib-exception_handler_unittest.Po@am__quote@
