@@ -59,7 +59,8 @@ bool BacktraceHandlerContext::MinidumpCallback(
 
   if (succeeded) {
     /* FIXME: http_layer calls dlopen("curl.so"), curl is a hidden dep. */
-    if (!ctx_->http_layer_->Init()) std::cerr << "http layer init failed\n";
+    auto http_layer = ctx_->http_layer_.get();
+    if (!http_layer->Init()) std::cerr << "http layer init failed\n";
 
     string minidump_pathname = descriptor.path();
     struct stat st;
@@ -69,20 +70,20 @@ bool BacktraceHandlerContext::MinidumpCallback(
     }
 
     /* FIXME: properly parse url and adjust query string sanely */
-    /* FIXME: attributes are sent via form-data, coronerd handle this? */
-    std::string url =
-        ctx_->url_ + "/post?format=minidump&token=" + ctx_->token_;
+    std::string url = ctx_->url_ + "/api/minidump/post";
+    if (!http_layer->AddFormParameter("token", ctx_->token_)) return false;
+    for (auto const& kv : ctx_->attributes_)
+      if (!http_layer->AddFormParameter(kv.first, kv.second)) return false;
 
-    if (!ctx_->http_layer_->AddFile(minidump_pathname,
-                                    "upload_file_minidump")) {
+    if (!http_layer->AddFile(minidump_pathname, "upload_file_minidump"))
       return false;
-    }
 
     int http_status_code;
     string http_response_header;
     string http_response_body;
+    std::map<string, string> dummy_map;
     bool send_success = ctx_->http_layer_->SendRequest(
-        url, ctx_->attributes_, &http_status_code, &http_response_header,
+        url, dummy_map, &http_status_code, &http_response_header,
         &http_response_body);
 
     if (!send_success || !isSuccessfulHttpCode(http_status_code)) {

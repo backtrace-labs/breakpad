@@ -49,6 +49,8 @@ class LibcurlWrapper {
                         const string& proxy_userpwd);
   virtual bool AddFile(const string& upload_file_path,
                        const string& basename);
+  virtual bool AddFormParameter(const string& key,
+                                const string& value);
   virtual bool SendRequest(const string& url,
                            const std::map<string, string>& parameters,
                            int* http_status_code,
