@@ -91,9 +91,9 @@ bool BacktraceHandlerContext::MinidumpCallback(
                 << http_status_code << " with request:\n\n"
                 << http_response_header << "\n"
                 << http_response_body;
-    }
 
-    return send_success;
+      return false;
+    }
   }
 
   return succeeded;
