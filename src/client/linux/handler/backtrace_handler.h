@@ -11,6 +11,8 @@ namespace google_breakpad {
 class BacktraceHandler {
  public:
   // Initialize BacktraceHandler.
+  //
+  // Return true if successful.
   static bool Init(const string& url, const string& token,
                    const std::unordered_map<string, string>& attributes);
 
