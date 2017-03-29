@@ -1,8 +1,8 @@
 #ifndef CLIENT_LINUX_HANDLER_BACKTRACE_HANDLER_H_
 #define CLIENT_LINUX_HANDLER_BACKTRACE_HANDLER_H_
 
-#include <map>
 #include <string>
+#include <unordered_map>
 
 #include "common/using_std_string.h"
 
@@ -12,7 +12,7 @@ class BacktraceHandler {
  public:
   // Initialize BacktraceHandler.
   static bool Init(const string& url, const string& token,
-                   const std::map<string, string>& attributes);
+                   const std::unordered_map<string, string>& attributes);
 
   // Add or Replace an attribute.
   //

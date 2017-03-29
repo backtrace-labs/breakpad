@@ -20,11 +20,11 @@ const string kDefaultDescriptorPath = "/tmp";
 class BacktraceHandlerContext {
  public:
   BacktraceHandlerContext(const string& url, const string& token,
-                          const std::map<string, string>& attributes);
+                          const std::unordered_map<string, string>& attributes);
 
   string url_;
   string token_;
-  std::map<string, string> attributes_;
+  std::shared_ptr<std::unordered_map<string, string>> attributes_;
 
   scoped_ptr<LibcurlWrapper> http_layer_;
 
@@ -42,10 +42,10 @@ BacktraceHandlerContext* ctx_ = nullptr;
 
 BacktraceHandlerContext::BacktraceHandlerContext(
     const string& url, const string& token,
-    const std::map<string, string>& attributes)
+    const std::unordered_map<string, string>& attributes)
     : url_(url),
       token_(token),
-      attributes_(attributes),
+      attributes_(new std::unordered_map<string, string>(attributes)),
       http_layer_(new LibcurlWrapper()),
       descriptor_(kDefaultDescriptorPath),
       handler_(descriptor_, NULL, MinidumpCallback, NULL, true, -1) {}
@@ -69,10 +69,15 @@ bool BacktraceHandlerContext::MinidumpCallback(
       return false;
     }
 
+    auto attributes = ctx_->attributes_;
+    auto attrs_ = attributes.get();
+    /* This shouldn't happen */
+    if (attrs_ == nullptr) return false;
+
     /* FIXME: properly parse url and adjust query string sanely */
     std::string url = ctx_->url_ + "/api/minidump/post";
     if (!http_layer->AddFormParameter("token", ctx_->token_)) return false;
-    for (auto const& kv : ctx_->attributes_)
+    for (auto const& kv : *(attrs_))
       if (!http_layer->AddFormParameter(kv.first, kv.second)) return false;
 
     if (!http_layer->AddFile(minidump_pathname, "upload_file_minidump"))
@@ -99,8 +104,9 @@ bool BacktraceHandlerContext::MinidumpCallback(
   return succeeded;
 }
 
-bool BacktraceHandler::Init(const string& url, const string& token,
-                            const std::map<string, string>& attributes) {
+bool BacktraceHandler::Init(
+    const string& url, const string& token,
+    const std::unordered_map<string, string>& attributes) {
   if (ctx_ != nullptr) return false;
 
   ctx_ = new BacktraceHandlerContext(url, token, attributes);
@@ -108,5 +114,55 @@ bool BacktraceHandler::Init(const string& url, const string& token,
   return true;
 }
 
-/* FIXME: implement SetOrReplaceAttribute and RemoveAttribute */
+bool BacktraceHandler::SetOrReplaceAttribute(const string& key,
+                                             const string& val) {
+  if (ctx_ == nullptr) return false;
+
+  for (;;) {
+    auto old_attrs = ctx_->attributes_;
+
+    /* Make sure it's pointing to something */
+    auto old_attrs_ = old_attrs.get();
+    if (old_attrs_ == nullptr) return false;
+
+    /* Copy attributes in a newly allocated map */
+    std::shared_ptr<std::unordered_map<string, string>> new_attrs(
+        new std::unordered_map<string, string>(*old_attrs_));
+
+    /* Modify new map */
+    new_attrs.get()->erase(key);
+    new_attrs.get()->insert({key, val});
+
+    /* Swap */
+    if (atomic_compare_exchange_weak(&ctx_->attributes_, &old_attrs, new_attrs))
+      break;
+  }
+
+  return true;
+}
+
+bool BacktraceHandler::RemoveAttribute(const string& key) {
+  if (ctx_ == nullptr) return false;
+
+  for (;;) {
+    /* Increment shared_ptr count */
+    auto old_attrs = ctx_->attributes_;
+
+    auto old_attrs_ = old_attrs.get();
+    if (old_attrs_ == nullptr) return false;
+
+    /* Copy attributes in a newly allocated map */
+    std::shared_ptr<std::unordered_map<string, string>> new_attrs(
+        new std::unordered_map<string, string>(*old_attrs_));
+
+    /* Modify new map */
+    new_attrs.get()->erase(key);
+
+    /* Swap */
+    if (atomic_compare_exchange_weak(&ctx_->attributes_, &old_attrs, new_attrs))
+      break;
+  }
+
+  return true;
+}
 }
