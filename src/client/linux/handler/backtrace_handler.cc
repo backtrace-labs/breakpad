@@ -82,9 +82,9 @@ bool BacktraceHandlerContext::MinidumpCallback(
     string http_response_header;
     string http_response_body;
     std::map<string, string> dummy_map;
-    bool send_success = ctx_->http_layer_->SendRequest(
-        url, dummy_map, &http_status_code, &http_response_header,
-        &http_response_body);
+    bool send_success =
+        http_layer->SendRequest(url, dummy_map, &http_status_code,
+                                &http_response_header, &http_response_body);
 
     if (!send_success || !isSuccessfulHttpCode(http_status_code)) {
       std::cerr << "Failed to send dump to " << url << "\n Received error code "
