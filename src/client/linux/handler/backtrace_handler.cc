@@ -120,20 +120,15 @@ bool BacktraceHandler::SetOrReplaceAttribute(const string& key,
 
   for (;;) {
     auto old_attrs = ctx_->attributes_;
-
-    /* Make sure it's pointing to something */
     auto old_attrs_ = old_attrs.get();
     if (old_attrs_ == nullptr) return false;
 
-    /* Copy attributes in a newly allocated map */
     std::shared_ptr<std::unordered_map<string, string>> new_attrs(
         new std::unordered_map<string, string>(*old_attrs_));
 
-    /* Modify new map */
     new_attrs.get()->erase(key);
     new_attrs.get()->insert({key, val});
 
-    /* Swap */
     if (atomic_compare_exchange_weak(&ctx_->attributes_, &old_attrs, new_attrs))
       break;
   }
@@ -145,20 +140,15 @@ bool BacktraceHandler::RemoveAttribute(const string& key) {
   if (ctx_ == nullptr) return false;
 
   for (;;) {
-    /* Increment shared_ptr count */
     auto old_attrs = ctx_->attributes_;
-
     auto old_attrs_ = old_attrs.get();
     if (old_attrs_ == nullptr) return false;
 
-    /* Copy attributes in a newly allocated map */
     std::shared_ptr<std::unordered_map<string, string>> new_attrs(
         new std::unordered_map<string, string>(*old_attrs_));
 
-    /* Modify new map */
     new_attrs.get()->erase(key);
 
-    /* Swap */
     if (atomic_compare_exchange_weak(&ctx_->attributes_, &old_attrs, new_attrs))
       break;
   }
