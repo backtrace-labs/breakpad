@@ -60,7 +60,7 @@ bool BacktraceHandlerContext::MinidumpCallback(
   if (succeeded) {
     /* FIXME: http_layer calls dlopen("curl.so"), curl is a hidden dep. */
     auto http_layer = ctx_->http_layer_.get();
-    if (!http_layer->Init()) std::cerr << "http layer init failed\n";
+    if (!http_layer->Init()) return false;
 
     string minidump_pathname = descriptor.path();
     struct stat st;
