@@ -73,7 +73,7 @@ bool BacktraceHandlerContext::MinidumpCallback(
     if (attrs_ == nullptr) return false;
 
     /* FIXME: properly parse url and adjust query string sanely */
-    std::string url = ctx->url_ + "/api/minidump/post";
+    std::string url = ctx->url_ + "/api/post?format=minidump";
     if (!http_layer->AddFormParameter("token", ctx->token_)) return false;
     for (auto const& kv : *(attrs_))
       if (!http_layer->AddFormParameter(kv.first, kv.second)) return false;
