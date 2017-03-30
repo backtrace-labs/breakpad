@@ -96,6 +96,20 @@ bool LibcurlWrapper::AddFile(const string& upload_file_path,
   return true;
 }
 
+bool LibcurlWrapper::AddFormParameter(const string& key,
+                                      const string& value) {
+  if (!init_ok_) {
+    return false;
+  }
+  // Add form parameter.
+  (*formadd_)(&formpost_, &lastptr_,
+              CURLFORM_COPYNAME, key.c_str(),
+              CURLFORM_COPYCONTENTS, value.c_str(),
+              CURLFORM_END);
+
+  return true;
+}
+
 // Callback to get the response data from server.
 static size_t WriteCallback(void *ptr, size_t size,
                             size_t nmemb, void *userp) {
