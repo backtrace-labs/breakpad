@@ -37,8 +37,7 @@ class BacktraceHandlerContext {
 };
 
 /* Global shared context */
-/* FIXME: protect with mutex */
-BacktraceHandlerContext* ctx_ = nullptr;
+std::shared_ptr<BacktraceHandlerContext> ctx_;
 
 BacktraceHandlerContext::BacktraceHandlerContext(
     const string& url, const string& token,
@@ -55,12 +54,11 @@ bool isSuccessfulHttpCode(int code) { return (200 <= code && code < 300); }
 bool BacktraceHandlerContext::MinidumpCallback(
     const google_breakpad::MinidumpDescriptor& descriptor, void* context,
     bool succeeded) {
-  if (ctx_ == nullptr) return false;
+  auto ctx = ctx_.get();
+  if (ctx == nullptr) return false;
 
   if (succeeded) {
-    /* FIXME: http_layer calls dlopen("curl.so"), curl is a hidden dep. */
-    auto http_layer = ctx_->http_layer_.get();
-    if (!http_layer->Init()) return false;
+    auto http_layer = ctx->http_layer_.get();
 
     string minidump_pathname = descriptor.path();
     struct stat st;
@@ -69,14 +67,14 @@ bool BacktraceHandlerContext::MinidumpCallback(
       return false;
     }
 
-    auto attributes = ctx_->attributes_;
+    auto attributes = ctx->attributes_;
     auto attrs_ = attributes.get();
     /* This shouldn't happen */
     if (attrs_ == nullptr) return false;
 
     /* FIXME: properly parse url and adjust query string sanely */
-    std::string url = ctx_->url_ + "/api/minidump/post";
-    if (!http_layer->AddFormParameter("token", ctx_->token_)) return false;
+    std::string url = ctx->url_ + "/api/minidump/post";
+    if (!http_layer->AddFormParameter("token", ctx->token_)) return false;
     for (auto const& kv : *(attrs_))
       if (!http_layer->AddFormParameter(kv.first, kv.second)) return false;
 
@@ -109,7 +107,8 @@ bool BacktraceHandler::Init(
     const std::unordered_map<string, string>& attributes) {
   if (ctx_ != nullptr) return false;
 
-  ctx_ = new BacktraceHandlerContext(url, token, attributes);
+  ctx_.reset(new BacktraceHandlerContext(url, token, attributes));
+  if (ctx_.get()->http_layer_.get()->Init()) return false;
 
   return true;
 }
