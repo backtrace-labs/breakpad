@@ -45,6 +45,9 @@
 #endif
 
 #include <limits>
+#include <regex>
+#include <unordered_map>
+#include <sstream>
 
 namespace {
 
@@ -140,6 +143,74 @@ class SwiftLanguage: public Language {
 
 SwiftLanguage SwiftLanguageSingleton;
 
+static bool rust_replace_dollar(string::const_iterator it, const string::const_iterator eit,
+				std::ostringstream& o) {
+  static const std::unordered_map<string, char> map{
+    { "C",   ',' },
+
+    { "SP",  '@'  },
+    { "BP",  '*'  },
+    { "RF",  '&'  },
+    { "LT",  '<'  },
+    { "GT",  '>'  },
+    { "LP",  '('  },
+    { "RP",  ')'  },
+
+    { "u20", ' '  },
+    { "u22", '\\' },
+    { "u27", '\'' },
+    { "u2b", '+'  },
+
+    { "u3b", ';'  },
+
+    { "u5b", '['  },
+    { "u5d", ']'  },
+
+    { "u7b", '{'  },
+    { "u7d", '}'  },
+    { "u7e", '~'  },
+  };
+
+  const string::const_iterator e = std::find(it, eit, '$');
+  if (e == eit)
+    return false;
+
+  string l{it, e};
+  auto c = map.find(l);
+  if (c == map.end())
+    return false;
+
+  o << c->second;
+
+  return true;
+}
+
+static bool rust_scan_replace(const string& s, std::ostringstream& o) {
+  string::const_iterator it = begin(s);
+  const string::const_iterator eit = end(s);
+
+  while (it != eit) {
+    switch (*it) {
+    case '_':
+      // TODO
+      break;
+    case '$':
+      advance(it, 1);
+      if (it == eit)
+	goto fail;
+      if (!rust_replace_dollar(it, eit, o))
+	goto fail;
+      break;
+    default:
+      o << *it;
+    }
+    advance(it, 1);
+  }
+  return true;
+fail:
+  return false;
+}
+
 // Rust language-specific operations.
 class RustLanguage: public Language {
  public:
@@ -163,12 +234,32 @@ class RustLanguage: public Language {
     }
     demangled->assign(rust_demangled);
     free_rust_demangled_name(rust_demangled);
-#else
-    // Otherwise, pass through the mangled name so callers can demangle
-    // after the fact.
-    demangled->assign(mangled);
-#endif
     return kDemangleSuccess;
+#else
+    static std::regex re{"(^[a-zA-Z0-9_.:$]+)::h([a-f0-9]{16})$",
+		         std::regex_constants::ECMAScript|
+		         std::regex_constants::optimize};
+    std::smatch sm;
+
+    demangled->clear();
+    int status;
+    char *cpp_demangled = abi::__cxa_demangle(mangled.c_str(), NULL, NULL, &status);
+    if (status != 0)
+	    return kDemangleFailure;
+    string rd{cpp_demangled};
+    free(cpp_demangled);
+    cpp_demangled = nullptr;
+
+    if (!regex_match(rd, sm, re))
+	    return kDemangleFailure;
+
+    std::ostringstream o;
+    if (!rust_scan_replace(sm.str(1), o))
+	    return kDemangleFailure;
+
+    *demangled = o.str();
+    return kDemangleSuccess;
+#endif
   }
 };
 
