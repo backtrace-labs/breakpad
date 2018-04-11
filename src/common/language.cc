@@ -143,7 +143,9 @@ class SwiftLanguage: public Language {
 
 SwiftLanguage SwiftLanguageSingleton;
 
-static bool rust_replace_dollar(string::const_iterator it, const string::const_iterator eit,
+
+static bool rust_replace_dollar(string::const_iterator& it,
+				const string::const_iterator& eit,
 				std::ostringstream& o) {
   static const std::unordered_map<string, char> map{
     { "C",   ',' },
@@ -169,7 +171,7 @@ static bool rust_replace_dollar(string::const_iterator it, const string::const_i
     { "u7b", '{'  },
     { "u7d", '}'  },
     { "u7e", '~'  },
-  };
+      };
 
   const string::const_iterator e = std::find(it, eit, '$');
   if (e == eit)
@@ -182,24 +184,42 @@ static bool rust_replace_dollar(string::const_iterator it, const string::const_i
 
   o << c->second;
 
+  it = e;
+
   return true;
 }
 
-static bool rust_scan_replace(const string& s, std::ostringstream& o) {
+static bool rust_scan_replace(const string& s,
+                              std::ostringstream& o) {
   string::const_iterator it = begin(s);
   const string::const_iterator eit = end(s);
 
   while (it != eit) {
     switch (*it) {
     case '_':
-      // TODO
+      if ((it == begin(s) || *prev(it) == ':') &&
+          (next(it) != eit && *next(it) == '$'))
+        break;
+      o << *it;
       break;
     case '$':
       advance(it, 1);
       if (it == eit)
-	goto fail;
+        goto fail;
       if (!rust_replace_dollar(it, eit, o))
-	goto fail;
+        goto fail;
+      break;
+    case '.':
+      if (next(it) != eit &&
+          *next(it) == '.') {
+        advance(it, 1);
+        o << "::";
+        if (next(it) != eit &&
+            *next(it) == '.')
+          goto fail;
+      } else {
+        o << '-';
+      }
       break;
     default:
       o << *it;
@@ -237,25 +257,26 @@ class RustLanguage: public Language {
     return kDemangleSuccess;
 #else
     static std::regex re{"(^[a-zA-Z0-9_.:$]+)::h([a-f0-9]{16})$",
-		         std::regex_constants::ECMAScript|
-		         std::regex_constants::optimize};
+        std::regex_constants::ECMAScript|
+        std::regex_constants::optimize};
     std::smatch sm;
 
     demangled->clear();
     int status;
-    char *cpp_demangled = abi::__cxa_demangle(mangled.c_str(), NULL, NULL, &status);
+    char *cpp_demangled = abi::__cxa_demangle(mangled.c_str(),
+                                              NULL, NULL, &status);
     if (status != 0)
-	    return kDemangleFailure;
+      return kDemangleFailure;
     string rd{cpp_demangled};
     free(cpp_demangled);
     cpp_demangled = nullptr;
 
     if (!regex_match(rd, sm, re))
-	    return kDemangleFailure;
+      return kDemangleFailure;
 
     std::ostringstream o;
     if (!rust_scan_replace(sm.str(1), o))
-	    return kDemangleFailure;
+      return kDemangleFailure;
 
     *demangled = o.str();
     return kDemangleSuccess;
