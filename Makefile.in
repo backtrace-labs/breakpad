@@ -310,6 +310,8 @@ am__src_client_linux_libbreakpad_client_a_SOURCES_DIST =  \
 	src/common/linux/elfutils.h src/common/linux/file_id.cc \
 	src/common/linux/file_id.h src/common/linux/guid_creator.cc \
 	src/common/linux/guid_creator.h \
+	src/common/linux/http_upload.cc \
+	src/common/linux/http_upload.h \
 	src/common/linux/linux_libc_support.cc \
 	src/common/linux/memory_mapped_file.cc \
 	src/common/linux/safe_readlink.cc \
@@ -335,6 +337,7 @@ am__dirstamp = $(am__leading_dot)dirstamp
 @LINUX_HOST_TRUE@	src/common/linux/elf_core_dump.$(OBJEXT) \
 @LINUX_HOST_TRUE@	src/common/linux/elfutils.$(OBJEXT) \
 @LINUX_HOST_TRUE@	src/common/linux/file_id.$(OBJEXT) \
+@LINUX_HOST_TRUE@       src/common/linux/http_upload.$(OBJEXT) \
 @LINUX_HOST_TRUE@	src/common/linux/guid_creator.$(OBJEXT) \
 @LINUX_HOST_TRUE@	src/common/linux/linux_libc_support.$(OBJEXT) \
 @LINUX_HOST_TRUE@	src/common/linux/memory_mapped_file.$(OBJEXT) \
