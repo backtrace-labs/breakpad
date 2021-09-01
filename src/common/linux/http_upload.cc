@@ -32,6 +32,7 @@
 #include <assert.h>
 #include <dlfcn.h>
 #include "third_party/curl/curl.h"
+#include <unistd.h>
 
 namespace {
 
@@ -52,6 +53,10 @@ static size_t WriteCallback(void *ptr, size_t size,
 namespace google_breakpad {
 
 static const char kUserAgent[] = "Breakpad/1.0 (Linux)";
+
+static bool verify_file_correct(const std::string &file_name) {
+  return access(file_name.c_str(), F_OK) == 0;
+}
 
 // static
 bool HTTPUpload::SendRequest(const string &url,
@@ -142,6 +147,8 @@ bool HTTPUpload::SendRequest(const string &url,
 
   // Add form files.
   for (iter = files.begin(); iter != files.end(); ++iter) {
+    if (verify_file_correct(iter->second) == false)
+      continue;
     (*curl_formadd)(&formpost, &lastptr,
                  CURLFORM_COPYNAME, iter->first.c_str(),
                  CURLFORM_FILE, iter->second.c_str(),
