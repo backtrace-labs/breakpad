@@ -128,8 +128,8 @@ bool BacktraceHandler::SetOrReplaceAttribute(const string& key,
     new_attrs.get()->erase(key);
     new_attrs.get()->insert({key, val});
 
-    if (atomic_compare_exchange_weak(&ctx_->attributes_, &old_attrs, new_attrs))
-      break;
+    //if (atomic_compare_exchange_weak(&ctx_->attributes_, &old_attrs, new_attrs))
+    break;
   }
 
   return true;
@@ -148,8 +148,8 @@ bool BacktraceHandler::RemoveAttribute(const string& key) {
 
     new_attrs.get()->erase(key);
 
-    if (atomic_compare_exchange_weak(&ctx_->attributes_, &old_attrs, new_attrs))
-      break;
+    //if (atomic_compare_exchange_weak(&ctx_->attributes_, &old_attrs, new_attrs))
+    break;
   }
 
   return true;

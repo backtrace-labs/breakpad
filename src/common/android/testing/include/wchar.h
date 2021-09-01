@@ -53,7 +53,7 @@ static wchar_t inline wcstolower(wchar_t ch) {
   return ch;
 }
 
-static int inline wcscasecmp(const wchar_t* s1, const wchar_t* s2) {
+/*static int inline wcscasecmp(const wchar_t* s1, const wchar_t* s2) {
   for (;;) {
     wchar_t c1 = wcstolower(*s1);
     wchar_t c2 = wcstolower(*s2);
@@ -66,7 +66,7 @@ static int inline wcscasecmp(const wchar_t* s1, const wchar_t* s2) {
     s1++;
     s2++;
   }
-}
+}*/
 
 #ifdef __cplusplus
 }  // extern "C"
